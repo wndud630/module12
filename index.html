@@ -7,7 +7,7 @@
   <style>
     #product360 {
       width: 100%;
-      height: 100%; /* 필요에 따라 높이를 조정 */
+      height: 100%"; /* 필요에 따라 높이를 조정 */
       position: relative;
       display: flex; /* 플렉스 박스 활성화 */
       justify-content: center; /* 가로 중앙 정렬 */
@@ -17,25 +17,29 @@
       width: 500px; /* 필요에 따라 크기 조정 */
       height: auto; /* 비율 유지 */
       display: block;
+      margin: 0 10px; /* 두 캔버스 사이에 간격 추가 */
     }
   </style>
 </head>
 <body>
   <!-- 360도 이미지를 표시할 div -->
   <div id="product360">
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas1"></canvas>
+    <canvas id="canvas2"></canvas>
   </div>
 
   <!-- 360도 이미지 회전 효과를 구현하는 자바스크립트 코드 -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-      
+      const canvas1 = document.getElementById('canvas1');
+      const canvas2 = document.getElementById('canvas2');
+      const ctx1 = canvas1.getContext('2d');
+      const ctx2 = canvas2.getContext('2d');
+
       // 이미지 파일들
       const images = [];
-      for (let i = 10001; i <= 10100; i++) {
-        images.push(`https://raw.githubusercontent.com/wndud630/module1/main/${i}.jpg`);
+      for (let i = 30001; i <= 30100; i++) {
+        images.push(`https://raw.githubusercontent.com/wndud630/module3/main/${i}.jpg`);
       }
 
       let currentIndex = Math.floor(images.length / 2); // 중간 이미지부터 시작
@@ -44,8 +48,10 @@
       const rotationFactor = 1; // 회전 속도 조절 인자
 
       // 캔버스 크기 설정
-      canvas.width = 500;  // 너비 설정
-      canvas.height = 500; // 높이 설정
+      canvas1.width = 500;
+      canvas1.height = 500;
+      canvas2.width = 500;
+      canvas2.height = 500;
 
       // 이미지 로드
       const imgElements = [];
@@ -65,30 +71,23 @@
 
       // 이미지 그리기
       function drawImage() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(imgElements[currentIndex], 0, 0, canvas.width, canvas.height);
+        ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+        ctx1.drawImage(imgElements[currentIndex], 0, 0, canvas1.width, canvas1.height);
+        ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+        ctx2.drawImage(imgElements[currentIndex], 0, 0, canvas2.width, canvas2.height);
       }
 
       // 마우스가 캔버스로 들어올 때 커서 이미지 변경
-      canvas.addEventListener('mouseenter', () => {
-        canvas.style.cursor = `url(https://cdn.imweb.me/thumbnail/20241111/cd03d21ffa98d.png), auto`;
+      canvas1.addEventListener('mouseenter', () => {
+        canvas1.style.cursor = `url(https://cdn.imweb.me/thumbnail/20241111/cd03d21ffa98d.png), auto`;
       });
 
       // 드래그 이벤트 처리
-      canvas.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.clientX;
-      });
-
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-      });
-
-      document.addEventListener('mousemove', (e) => {
+      function handleDrag(e) {
         if (isDragging) {
           const dx = e.clientX - startX;
           const numImages = imgElements.length;
-          const step = Math.round((dx / canvas.width) * numImages * rotationFactor);
+          const step = Math.round((dx / canvas1.width) * numImages * rotationFactor);
           
           // 이미지가 순환되지 않도록 제한
           currentIndex = Math.min(Math.max(currentIndex + step, 0), numImages - 1);
@@ -96,23 +95,36 @@
           drawImage();
           startX = e.clientX;
         }
+      }
+
+      // 마우스 드래그 시작
+      canvas1.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        document.addEventListener('mousemove', handleDrag); // 드래그 중에 계속 처리
+      });
+
+      // 마우스 드래그 종료
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag); // 드래그 종료시 이벤트 제거
       });
 
       // 터치 이벤트
-      canvas.addEventListener('touchstart', (e) => {
+      canvas1.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].clientX;
       });
 
-      canvas.addEventListener('touchend', () => {
+      canvas1.addEventListener('touchend', () => {
         isDragging = false;
       });
 
-      canvas.addEventListener('touchmove', (e) => {
+      canvas1.addEventListener('touchmove', (e) => {
         if (isDragging) {
           const dx = e.touches[0].clientX - startX;
           const numImages = imgElements.length;
-          const step = Math.round((dx / canvas.width) * numImages * rotationFactor);
+          const step = Math.round((dx / canvas1.width) * numImages * rotationFactor);
           
           // 이미지가 순환되지 않도록 제한
           currentIndex = Math.min(Math.max(currentIndex + step, 0), numImages - 1);
